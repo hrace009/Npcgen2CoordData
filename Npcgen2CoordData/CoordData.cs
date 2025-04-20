@@ -29,7 +29,7 @@ namespace Npcgen2CoordData
         public void Read(string path)
         {
             ProgressMax?.Invoke(File.ReadAllLines(path).Length);
-            ProgressText("Загружаем coord_data.txt");
+            ProgressText("Loading coord_data.txt");
             StreamReader sr = new StreamReader(path);
             Header = sr.ReadLine();
             while (!sr.EndOfStream)
@@ -50,7 +50,7 @@ namespace Npcgen2CoordData
                 }
             }
             ProgressValue?.Invoke(0);
-            ProgressText?.Invoke($"coord_data.txt загружен, {Entrys.Keys.Count} объектов");
+            ProgressText?.Invoke($"coord_data.txt loaded, {Entrys.Keys.Count} objects");
             sr.Close();
         }
 
@@ -69,8 +69,9 @@ namespace Npcgen2CoordData
                 });
             }
             ProgressValue?.Invoke(0);
-            ProgressText?.Invoke($"coord_data.txt успешно сохранен");
+            ProgressText?.Invoke($"coord_data.txt successfully saved");
             sw.Close();
         }
+
     }
 }

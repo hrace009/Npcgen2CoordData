@@ -140,7 +140,7 @@ namespace Npcgen2CoordData
 
         public void ReadNpcgen(BinaryReader br)
         {
-            ProgressText?.Invoke("Загружаем npcgen.data");
+            ProgressText?.Invoke("Loading npcgen.data");
             File_version = br.ReadInt32();
             NpcMobsAmount = br.ReadInt32();
             ResourcesAmount = br.ReadInt32();
@@ -160,7 +160,7 @@ namespace Npcgen2CoordData
                 ResourcesList.Add(ReadResource(br, File_version));
                 ProgressNext?.Invoke();
             }
-            ProgressText?.Invoke($"npcgen.data загружен, {NpcMobsAmount + ResourcesAmount} объектов");
+            ProgressText?.Invoke($"npcgen.data loaded, {NpcMobsAmount + ResourcesAmount} objects");
             ProgressValue(0);
             br.Close();
         }

@@ -5,3 +5,12 @@ c:\users\kn1fe\documents\visual studio 2017\Projects\Npcgen2CoordData\Npcgen2Coo
 c:\users\kn1fe\documents\visual studio 2017\Projects\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.csproj.GenerateResource.Cache
 c:\users\kn1fe\documents\visual studio 2017\Projects\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.exe
 c:\users\kn1fe\documents\visual studio 2017\Projects\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.pdb
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\bin\Release\Npcgen2CoordData.exe
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\bin\Release\Npcgen2CoordData.pdb
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.csproj.AssemblyReference.cache
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.Form1.resources
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.Properties.Resources.resources
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.csproj.GenerateResource.cache
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.csproj.CoreCompileInputs.cache
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.exe
+D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Release\Npcgen2CoordData.pdb

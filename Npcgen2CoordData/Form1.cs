@@ -87,13 +87,13 @@ namespace Npcgen2CoordData
             };
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                new Thread(() => 
+                new Thread(() =>
                 {
                     ProgressMax(npcgen.NpcMobList.Count + npcgen.ResourcesList.Count);
                     List<int> cleared = new List<int>();
                     npcgen.ReadNpcgen(new BinaryReader(File.OpenRead(ofd.FileName)));
-                    ProgressText("Импортируем");
-                    string map = Microsoft.VisualBasic.Interaction.InputBox("Название локации в которой находятся мобы, например, world, a78, a64", "Название локации", "world");
+                    ProgressText("Importing");
+                    string map = Microsoft.VisualBasic.Interaction.InputBox("Enter the name of the location where the mobs are located, e.g., world, a78, a64", "Location Name", "world");
                     npcgen.NpcMobList.ForEach(x =>
                     {
                         ProgressNext();
@@ -118,15 +118,15 @@ namespace Npcgen2CoordData
                             {
                                 cleared.Add(y.Id);
                                 coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
-                                {
-                                    new CoordDataEntry()
-                                    {
-                                        MapNumber = map,
-                                        X = x.X_position,
-                                        Y = x.Y_position,
-                                        Z = x.Z_position
-                                    }
-                                };
+                        {
+                            new CoordDataEntry()
+                            {
+                                MapNumber = map,
+                                X = x.X_position,
+                                Y = x.Y_position,
+                                Z = x.Z_position
+                            }
+                        };
                             }
                         });
                     });
@@ -154,22 +154,27 @@ namespace Npcgen2CoordData
                             {
                                 cleared.Add(y.Id);
                                 coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
-                                {
-                                    new CoordDataEntry()
-                                    {
-                                        MapNumber = map,
-                                        X = x.X_position,
-                                        Y = x.Y_position,
-                                        Z = x.Z_position
-                                    }
-                                };
+                        {
+                            new CoordDataEntry()
+                            {
+                                MapNumber = map,
+                                X = x.X_position,
+                                Y = x.Y_position,
+                                Z = x.Z_position
+                            }
+                        };
                             }
                         });
                     });
                     ProgressValue(0);
-                    ProgressText("Готово");
+                    ProgressText("Done");
                 }).Start();
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
