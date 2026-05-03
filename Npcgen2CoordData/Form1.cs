@@ -89,9 +89,10 @@ namespace Npcgen2CoordData
             {
                 new Thread(() =>
                 {
-                    ProgressMax(npcgen.NpcMobList.Count + npcgen.ResourcesList.Count);
                     List<int> cleared = new List<int>();
                     npcgen.ReadNpcgen(new BinaryReader(File.OpenRead(ofd.FileName)));
+                    ProgressMax(npcgen.NpcMobList.Count + npcgen.ResourcesList.Count);
+                    ProgressValue(0);
                     ProgressText("Importing");
                     string map = Microsoft.VisualBasic.Interaction.InputBox("Enter the name of the location where the mobs are located, e.g., world, a78, a64", "Location Name", "world");
                     npcgen.NpcMobList.ForEach(x =>
