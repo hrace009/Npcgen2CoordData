@@ -1,61 +1,156 @@
-# Npcgen2CoordData
+﻿# Npcgen2CoordData
 
-A Windows Forms utility tool for game server administrators to import NPC/mob spawn positions and resource spawn positions from `npcgen.data` binary files into `coord_data.txt`.
+A small Windows Forms utility that imports mob/resource spawn coordinates from a Perfect World style
+`npcgen.data` binary file and merges them into a tab-separated `coord_data.txt` file used by related
+server tooling.
 
 ## Overview
 
-`Npcgen2CoordData` reads the binary `npcgen.data` file (used in Perfect World-based game servers) and extracts the 3D coordinates of mob spawns and resource spawns, then writes them into the `coord_data.txt` format used by the game server.
+The tool offers three actions through a single form:
 
-## Features
+- **Load coord_data** — read an existing `coord_data.txt` into memory.
+- **Import npcgen.data** — parse a binary `npcgen.data`, prompt for a location name
+  (e.g. `world`, `a78`, `a64`) via an `InputBox`, and merge mob (`NpcMobList`) and resource
+  (`ResourcesList`) spawn positions into the loaded coord data, keyed by entity id.
+- **Save coord_data** — write the merged result back out as `coord_data.txt`.
 
-- Load and parse `npcgen.data` binary files (supports file versions up to v11+)
-- Load existing `coord_data.txt` files
-- Import mob spawn coordinates from `npcgen.data` into `coord_data.txt`
-- Import resource spawn coordinates from `npcgen.data` into `coord_data.txt`
-- Specify a custom map/location name (e.g., `world`, `a78`, `a64`) during import
-- Save the updated `coord_data.txt` file
-- Progress bar and status indicator during file operations
+Long-running file I/O runs on background threads; progress is reported through the form's
+progress bar and status label.
 
-## How It Works
+## Stack
 
-### Input: `npcgen.data`
-
-A binary file containing:
-- **NPC/Mob Spawns** — spawn groups with 3D positions, directions, and a list of mob entries (ID, respawn time, aggression, path, etc.)
-- **Resource Spawns** — resource groups with 3D positions and a list of resource entries (ID, type, respawn time, amount)
-- **Dynamic Objects** — static world objects with positions and rotation
-- **Triggers** — scheduled event triggers (present in file version > 6)
-
-### Output: `coord_data.txt`
-
-A tab-separated text file with the following column structure:
-
-```
-<NPC/Resource ID>   <MapName>   <X>   <Y>   <Z>
-```
-
-Each entry maps an NPC or resource ID to its world coordinates on a specific map.
-
-## Usage
-
-1. **Load coord_data.txt** — Click **Load Coord Data** and select your existing `coord_data.txt` file.
-2. **Import npcgen.data** — Click **Import** and select the `npcgen.data` file. Enter the map location name when prompted (e.g., `world`, `a78`).
-3. **Save coord_data.txt** — Click **Save Coord Data** and choose a destination path to save the updated file.
+- **Language:** C# 7.3
+- **Framework:** .NET Framework 3.5 (`v3.5`, WinForms)
+- **Output type:** `WinExe` (`AnyCPU`)
+- **Project format:** legacy (non-SDK) MSBuild `.csproj`, `ToolsVersion="15.0"`
+- **UI:** Windows Forms (Classic) + `Microsoft.VisualBasic.Interaction.InputBox` for the location prompt
+- **Package manager:** none (only GAC / framework references; no NuGet packages)
+- **Solution:** `Npcgen2CoordData.sln`
 
 ## Requirements
 
-- Windows OS
-- .NET Framework 3.5
-
-## Project Structure
-
-| File | Description |
-|------|-------------|
-| `Form1.cs` | Main UI form — handles file dialogs, threading, and import logic |
-| `npcgen.cs` | Binary parser and writer for `npcgen.data`; defines all data model classes |
-| `CoordData.cs` | Reader and writer for `coord_data.txt` |
-| `Program.cs` | Application entry point |
+- Windows with the **.NET Framework 3.5 SP1** targeting pack installed
+  (Windows feature: *".NET Framework 3.5 (includes .NET 2.0 and 3.0)"*). Without it MSBuild
+  cannot resolve `mscorlib` / `System.Windows.Forms` reference assemblies.
+- **MSBuild** shipped with Visual Studio 2017+ or JetBrains Rider (uses the Roslyn `csc.exe`).
+  Do **not** build with the legacy `C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe` — it is C# 3.0
+  only and will fail on the string interpolation / `?.` syntax used in the codebase.
+- A real runtime dependency on `Microsoft.VisualBasic` (used for the location-name `InputBox`).
 
 ## Build
 
-Open `Npcgen2CoordData.sln` in Visual Studio and build the solution. Targets **.NET Framework 3.5**, compatible with Visual Studio 2017 and later.
+From the repository root in PowerShell:
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\<edition>\MSBuild\Current\Bin\MSBuild.exe" `
+    Npcgen2CoordData\Npcgen2CoordData.csproj /v:m /nologo
+```
+
+Replace `<edition>` with your installed VS edition (e.g. `2022\Community`). Rider users can simply
+open `Npcgen2CoordData.sln` and build.
+
+Build output:
+
+- `Npcgen2CoordData\bin\Debug\Npcgen2CoordData.exe`
+- `Npcgen2CoordData\bin\Release\Npcgen2CoordData.exe`
+
+## Run
+
+Launch the built executable directly:
+
+```powershell
+.\Npcgen2CoordData\bin\Debug\Npcgen2CoordData.exe
+```
+
+Typical workflow:
+
+1. Click **Load coord_data** and pick an existing `coord_data.txt` (optional — start empty otherwise).
+2. Click **Import npcgen.data** and pick a `npcgen.data` file. When prompted, enter the map / location
+   name (e.g. `world`).
+3. Click **Save coord_data** to write the merged output.
+
+### Entry point
+
+- `Npcgen2CoordData/Program.cs` → `Program.Main` → `Application.Run(new Form1())`
+- UI: `Npcgen2CoordData/Form1.cs` (+ `Form1.Designer.cs`, `Form1.resx`)
+
+## Scripts
+
+This repository ships **no build/run scripts, no `package.json`, no CI configuration**. The
+PowerShell command shown under [Build](#build) is the canonical way to compile from the command
+line.
+
+## Environment variables
+
+None are read by the application.
+
+## Tests
+
+There is **no test project, no test framework reference, and no CI** in this repository.
+
+Ad-hoc tests are written as standalone console programs that compile against the production `.cs`
+files directly. See `.junie/AGENTS.md` §2 for a verified end-to-end recipe (including a
+`CoordData` round-trip example). High-level steps:
+
+1. Create a `.cs` file at the repo root with `static int Main()` in `namespace Npcgen2CoordData`.
+2. Re-declare the four progress delegates (`SetProgressMax/Next/Value/Text`) in the test file
+   (they live in `Form1.cs`, which must not be pulled into the test build).
+3. Compile with the Roslyn `csc.exe` from VS/Rider's MSBuild folder (`/langversion:7.3`,
+   `/target:exe`) and include the production source files you exercise
+   (e.g. `Npcgen2CoordData\CoordData.cs`).
+4. Run the produced `.exe` and check `$LASTEXITCODE`.
+5. Delete the test source/binary afterwards so they do not leak into the project tree.
+
+> Note: at least `ProgressMax` (and, for `CoordData.Read`, `ProgressText`) is invoked
+> unconditionally without `?.` — tests must subscribe to those events or they will throw
+> `NullReferenceException`.
+
+## Project structure
+
+```
+Npcgen2CoordData.sln                  Visual Studio solution
+LICENSE                               GNU GPL v3
+README.md                             This file
+.junie/AGENTS.md                      Contributor notes (build, test recipe, gotchas)
+Npcgen2CoordData/
+├── Npcgen2CoordData.csproj           Legacy-format csproj, net35, WinExe
+├── Program.cs                        Application entry point
+├── Form1.cs                          Main form + progress delegate types
+├── Form1.Designer.cs                 Generated designer code
+├── Form1.resx                        Form resources
+├── CoordData.cs                      coord_data.txt reader/writer
+├── npcgen.cs                         npcgen.data binary reader (versioned format)
+├── icon.ico                          App icon (referenced as ApplicationIcon and Content)
+└── Properties/
+    ├── AssemblyInfo.cs
+    ├── Resources.resx / .Designer.cs (present, currently unused)
+    └── Settings.settings / .Designer.cs (present, currently unused)
+```
+
+## Known gotchas
+
+A few items worth knowing before changing code (see `.junie/AGENTS.md` for the full list):
+
+- **Culture-sensitive parsing.** `CoordData.Read`/`Save` assume the current thread culture uses
+  `,` as the decimal separator (`Replace('.', ',')` on read, `Replace(",", ".")` on save). On
+  `en-US` machines this throws `FormatException`. The proper fix is `CultureInfo.InvariantCulture`.
+- **Threading.** `Form1` sets `CheckForIllegalCrossThreadCalls = false` and updates UI from worker
+  threads directly. Do not introduce `Invoke`/`async`-`await` without auditing the whole flow.
+- **Binary format versioning.** `NpcGen.ReadNpcgen` branches on `Version > 6`, `> 9`, `>= 11`.
+  Mirror any additions in the corresponding `Write*` paths or saved files become unreadable.
+- **Public fields in data-carrier classes.** `npcgen.cs` reads/writes them in declaration order;
+  do not auto-refactor to properties or reorder.
+
+## License
+
+GNU General Public License v3.0 — see [`LICENSE`](LICENSE).
+
+## TODO
+
+- TODO: document the exact `npcgen.data` binary layout per version (v6 / v>6 / v>9 / v>=11).
+- TODO: clarify the expected text encoding for fixed-length name fields in `npcgen.cs`
+  (GBK/CP936 vs ASCII/UTF-8 per call site).
+- TODO: add a real automated test project (current ad-hoc recipe is manual).
+- TODO: confirm minimum supported Windows version and any localization assumptions for the
+  `coord_data.txt` decimal separator.
+- TODO: add screenshots of the main form to this README.

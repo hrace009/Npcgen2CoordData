@@ -15,3 +15,12 @@ D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcge
 D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.csproj.CoreCompileInputs.cache
 D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.exe
 D:\PW Data\01.PWCI-155\999.SRC\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.pdb
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\bin\Debug\Npcgen2CoordData.exe
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\bin\Debug\Npcgen2CoordData.pdb
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.csproj.AssemblyReference.cache
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.Form1.resources
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.Properties.Resources.resources
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.csproj.GenerateResource.cache
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.csproj.CoreCompileInputs.cache
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.exe
+C:\Users\hrace009\RiderProjects\Npcgen2CoordData\Npcgen2CoordData\obj\Debug\Npcgen2CoordData.pdb
