@@ -9,9 +9,12 @@ server tooling.
 The tool offers three actions through a single form:
 
 - **Load coord_data** — read an existing `coord_data.txt` into memory.
-- **Import npcgen.data** — parse a binary `npcgen.data`, prompt for a location name
-  (e.g. `world`, `a78`, `a64`) via an `InputBox`, and merge mob (`NpcMobList`) and resource
-  (`ResourcesList`) spawn positions into the loaded coord data, keyed by entity id.
+- **Import npcgen.data** — pick a server *maps root* folder (via `FolderBrowserDialog`); the
+  tool scans every immediate subfolder for an `npcgen.data` file, parses each one, and merges
+  mob (`NpcMobList`) and resource (`ResourcesList`) spawn positions into the loaded coord data,
+  keyed by entity id. The map / location name is taken from the subfolder name
+  (e.g. `world`, `a78`, `a64`). Empty/truncated files and parse errors are skipped and listed
+  in the final status text.
 - **Save coord_data** — write the merged result back out as `coord_data.txt`.
 
 Long-running file I/O runs on background threads; progress is reported through the form's
@@ -23,7 +26,7 @@ progress bar and status label.
 - **Framework:** .NET Framework 3.5 (`v3.5`, WinForms)
 - **Output type:** `WinExe` (`AnyCPU`)
 - **Project format:** legacy (non-SDK) MSBuild `.csproj`, `ToolsVersion="15.0"`
-- **UI:** Windows Forms (Classic) + `Microsoft.VisualBasic.Interaction.InputBox` for the location prompt
+- **UI:** Windows Forms (Classic). A `FolderBrowserDialog` is used to pick the maps root for batch import.
 - **Package manager:** none (only GAC / framework references; no NuGet packages)
 - **Solution:** `Npcgen2CoordData.sln`
 
@@ -35,7 +38,9 @@ progress bar and status label.
 - **MSBuild** shipped with Visual Studio 2017+ or JetBrains Rider (uses the Roslyn `csc.exe`).
   Do **not** build with the legacy `C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe` — it is C# 3.0
   only and will fail on the string interpolation / `?.` syntax used in the codebase.
-- A real runtime dependency on `Microsoft.VisualBasic` (used for the location-name `InputBox`).
+- `Microsoft.VisualBasic` is still listed in `<ItemGroup>` but is **currently unused** by the
+  source (the previous `InputBox` prompt was replaced with a `FolderBrowserDialog`). The
+  reference is kept to avoid churning the legacy csproj; it can be removed safely if desired.
 
 ## Build
 
@@ -65,8 +70,10 @@ Launch the built executable directly:
 Typical workflow:
 
 1. Click **Load coord_data** and pick an existing `coord_data.txt` (optional — start empty otherwise).
-2. Click **Import npcgen.data** and pick a `npcgen.data` file. When prompted, enter the map / location
-   name (e.g. `world`).
+2. Click **Import npcgen.data** and select the *maps root* folder, i.e. the directory whose
+   immediate subfolders are individual maps containing an `npcgen.data` file (e.g.
+   `.../maps/world/npcgen.data`, `.../maps/a78/npcgen.data`). Each subfolder is processed in
+   one pass; the subfolder name becomes the map name in `coord_data.txt`.
 3. Click **Save coord_data** to write the merged output.
 
 ### Entry point
@@ -154,3 +161,4 @@ GNU General Public License v3.0 — see [`LICENSE`](LICENSE).
 - TODO: confirm minimum supported Windows version and any localization assumptions for the
   `coord_data.txt` decimal separator.
 - TODO: add screenshots of the main form to this README.
+- TODO: decide whether to drop the now-unused `Microsoft.VisualBasic` reference from the csproj.
