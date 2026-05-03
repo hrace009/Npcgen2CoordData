@@ -77,7 +77,7 @@
             this.import.Name = "import";
             this.import.Size = new System.Drawing.Size(320, 23);
             this.import.TabIndex = 4;
-            this.import.Text = "Import npcgen";
+            this.import.Text = "Import maps from server";
             this.import.UseVisualStyleBackColor = true;
             this.import.Click += new System.EventHandler(this.import_Click);
             // 

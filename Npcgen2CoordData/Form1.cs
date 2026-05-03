@@ -81,94 +81,164 @@ namespace Npcgen2CoordData
 
         private void import_Click(object sender, EventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog()
+            FolderBrowserDialog fbd = new FolderBrowserDialog()
             {
-                Filter = "Npcgen|Npcgen.data|All Files|*.*"
+                Description = "Select the server maps root folder (containing map subfolders with npcgen.data)",
+                ShowNewFolderButton = false
             };
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (fbd.ShowDialog() == DialogResult.OK)
             {
+                string root = fbd.SelectedPath;
                 new Thread(() =>
                 {
+                    string[] mapDirs = Directory.GetDirectories(root);
+                    List<string> targets = new List<string>();
+                    foreach (string dir in mapDirs)
+                    {
+                        string candidate = Path.Combine(dir, "npcgen.data");
+                        if (File.Exists(candidate))
+                        {
+                            targets.Add(dir);
+                        }
+                    }
+
+                    if (targets.Count == 0)
+                    {
+                        ProgressMax(1);
+                        ProgressValue(0);
+                        ProgressText("No npcgen.data found in subfolders");
+                        return;
+                    }
+
                     List<int> cleared = new List<int>();
-                    npcgen.ReadNpcgen(new BinaryReader(File.OpenRead(ofd.FileName)));
-                    ProgressMax(npcgen.NpcMobList.Count + npcgen.ResourcesList.Count);
+                    List<string> skipped = new List<string>();
+                    int imported = 0;
+                    ProgressMax(targets.Count);
                     ProgressValue(0);
-                    ProgressText("Importing");
-                    string map = Microsoft.VisualBasic.Interaction.InputBox("Enter the name of the location where the mobs are located, e.g., world, a78, a64", "Location Name", "world");
-                    npcgen.NpcMobList.ForEach(x =>
+
+                    foreach (string dir in targets)
                     {
-                        ProgressNext();
-                        x.MobDops.ForEach(y =>
+                        string map = Path.GetFileName(dir);
+                        string file = Path.Combine(dir, "npcgen.data");
+                        ProgressText("Importing " + map);
+
+                        NpcGen ng = new NpcGen();
+                        ng.ProgressMax += v => { };
+                        ng.ProgressNext += () => { };
+                        ng.ProgressText += ProgressText;
+                        ng.ProgressValue += v => { };
+
+                        try
                         {
-                            if (coord.Entrys.ContainsKey(y.Id.ToString()))
+                            FileInfo fi = new FileInfo(file);
+                            if (fi.Length < 16)
                             {
-                                if (!cleared.Contains(y.Id))
+                                skipped.Add(map + " (empty/too small)");
+                                ProgressNext();
+                                continue;
+                            }
+
+                            using (BinaryReader br = new BinaryReader(File.OpenRead(file)))
+                            {
+                                ng.ReadNpcgen(br);
+                            }
+                        }
+                        catch (EndOfStreamException)
+                        {
+                            skipped.Add(map + " (truncated)");
+                            ProgressNext();
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            skipped.Add(map + " (" + ex.GetType().Name + ")");
+                            ProgressNext();
+                            continue;
+                        }
+
+                        imported++;
+
+                        ng.NpcMobList.ForEach(x =>
+                        {
+                            x.MobDops.ForEach(y =>
+                            {
+                                if (coord.Entrys.ContainsKey(y.Id.ToString()))
                                 {
-                                    coord.Entrys[y.Id.ToString()].Clear();
-                                    cleared.Add(y.Id);
+                                    if (!cleared.Contains(y.Id))
+                                    {
+                                        coord.Entrys[y.Id.ToString()].Clear();
+                                        cleared.Add(y.Id);
+                                    }
+                                    coord.Entrys[y.Id.ToString()].Add(new CoordDataEntry()
+                                    {
+                                        MapNumber = map,
+                                        X = x.X_position,
+                                        Y = x.Y_position,
+                                        Z = x.Z_position
+                                    });
                                 }
-                                coord.Entrys[y.Id.ToString()].Add(new CoordDataEntry()
+                                else
                                 {
-                                    MapNumber = map,
-                                    X = x.X_position,
-                                    Y = x.Y_position,
-                                    Z = x.Z_position
-                                });
-                            }
-                            else
-                            {
-                                cleared.Add(y.Id);
-                                coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
-                        {
-                            new CoordDataEntry()
-                            {
-                                MapNumber = map,
-                                X = x.X_position,
-                                Y = x.Y_position,
-                                Z = x.Z_position
-                            }
-                        };
-                            }
-                        });
-                    });
-                    npcgen.ResourcesList.ForEach(x =>
-                    {
-                        ProgressNext();
-                        x.ResExtra.ForEach(y =>
-                        {
-                            if (coord.Entrys.ContainsKey(y.Id.ToString()))
-                            {
-                                if (!cleared.Contains(y.Id))
-                                {
-                                    coord.Entrys[y.Id.ToString()].Clear();
                                     cleared.Add(y.Id);
+                                    coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
+                                    {
+                                        new CoordDataEntry()
+                                        {
+                                            MapNumber = map,
+                                            X = x.X_position,
+                                            Y = x.Y_position,
+                                            Z = x.Z_position
+                                        }
+                                    };
                                 }
-                                coord.Entrys[y.Id.ToString()].Add(new CoordDataEntry()
-                                {
-                                    MapNumber = map,
-                                    X = x.X_position,
-                                    Y = x.Y_position,
-                                    Z = x.Z_position
-                                });
-                            }
-                            else
-                            {
-                                cleared.Add(y.Id);
-                                coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
-                        {
-                            new CoordDataEntry()
-                            {
-                                MapNumber = map,
-                                X = x.X_position,
-                                Y = x.Y_position,
-                                Z = x.Z_position
-                            }
-                        };
-                            }
+                            });
                         });
-                    });
+                        ng.ResourcesList.ForEach(x =>
+                        {
+                            x.ResExtra.ForEach(y =>
+                            {
+                                if (coord.Entrys.ContainsKey(y.Id.ToString()))
+                                {
+                                    if (!cleared.Contains(y.Id))
+                                    {
+                                        coord.Entrys[y.Id.ToString()].Clear();
+                                        cleared.Add(y.Id);
+                                    }
+                                    coord.Entrys[y.Id.ToString()].Add(new CoordDataEntry()
+                                    {
+                                        MapNumber = map,
+                                        X = x.X_position,
+                                        Y = x.Y_position,
+                                        Z = x.Z_position
+                                    });
+                                }
+                                else
+                                {
+                                    cleared.Add(y.Id);
+                                    coord.Entrys[y.Id.ToString()] = new List<CoordDataEntry>
+                                    {
+                                        new CoordDataEntry()
+                                        {
+                                            MapNumber = map,
+                                            X = x.X_position,
+                                            Y = x.Y_position,
+                                            Z = x.Z_position
+                                        }
+                                    };
+                                }
+                            });
+                        });
+
+                        ProgressNext();
+                    }
+
                     ProgressValue(0);
-                    ProgressText("Done");
+                    string summary = "Done. Imported " + imported + "/" + targets.Count + " map(s).";
+                    if (skipped.Count > 0)
+                    {
+                        summary += " Skipped: " + string.Join(", ", skipped.ToArray());
+                    }
+                    ProgressText(summary);
                 }).Start();
             }
         }
