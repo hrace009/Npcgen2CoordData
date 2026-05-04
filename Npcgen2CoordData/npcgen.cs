@@ -149,7 +149,7 @@ namespace Npcgen2CoordData
             {
                 TriggersAmount = br.ReadInt32();
             }
-            ProgressMax.Invoke(NpcMobsAmount + ResourcesAmount);
+            ProgressMax.Invoke(NpcMobsAmount + ResourcesAmount + DynobjectAmount);
             for (int i = 0; i < NpcMobsAmount; i++)
             {
                 NpcMobList.Add(ReadExistence(br, File_version));
@@ -160,7 +160,19 @@ namespace Npcgen2CoordData
                 ResourcesList.Add(ReadResource(br, File_version));
                 ProgressNext?.Invoke();
             }
-            ProgressText?.Invoke($"npcgen.data loaded, {NpcMobsAmount + ResourcesAmount} objects");
+            for (int i = 0; i < DynobjectAmount; i++)
+            {
+                DynamicsList.Add(ReadDynObjects(br, File_version));
+                ProgressNext?.Invoke();
+            }
+            if (File_version > 6)
+            {
+                for (int i = 0; i < TriggersAmount; i++)
+                {
+                    TriggersList.Add(ReadTrigger(br, File_version));
+                }
+            }
+            ProgressText?.Invoke($"npcgen.data loaded, {NpcMobsAmount + ResourcesAmount + DynobjectAmount} objects");
             ProgressValue(0);
             br.Close();
         }

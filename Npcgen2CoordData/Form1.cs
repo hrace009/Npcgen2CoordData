@@ -193,6 +193,38 @@ namespace Npcgen2CoordData
                                 }
                             });
                         });
+                        ng.DynamicsList.ForEach(x =>
+                        {
+                            if (coord.Entrys.ContainsKey(x.Id.ToString()))
+                            {
+                                if (!cleared.Contains(x.Id))
+                                {
+                                    coord.Entrys[x.Id.ToString()].Clear();
+                                    cleared.Add(x.Id);
+                                }
+                                coord.Entrys[x.Id.ToString()].Add(new CoordDataEntry()
+                                {
+                                    MapNumber = map,
+                                    X = x.X_position,
+                                    Y = x.Y_position,
+                                    Z = x.Z_position
+                                });
+                            }
+                            else
+                            {
+                                cleared.Add(x.Id);
+                                coord.Entrys[x.Id.ToString()] = new List<CoordDataEntry>
+                                {
+                                    new CoordDataEntry()
+                                    {
+                                        MapNumber = map,
+                                        X = x.X_position,
+                                        Y = x.Y_position,
+                                        Z = x.Z_position
+                                    }
+                                };
+                            }
+                        });
                         ng.ResourcesList.ForEach(x =>
                         {
                             x.ResExtra.ForEach(y =>
